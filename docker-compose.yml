@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:17.5
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: luminair
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Пробрасываем порт PostgreSQL
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile              # Dockerfile для вашего приложения
+    depends_on:
+      - db
+    container_name: db-explorer
+    environment:
+      DATABASE_URL: postgres://postgres:mypassword@db/luminair
+      RUST_LOG: debug                     # Логирование в приложении
+    ports:
+      - "8080:8080"                       # Проброс порта приложения (доступ к API)
+
+volumes:
+  postgres_data:
