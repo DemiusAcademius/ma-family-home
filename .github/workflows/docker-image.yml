@@ -27,7 +27,6 @@ jobs:
         audience: sts.amazonaws.com
         aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::377161178071:role/DeployFunctions
-        role-session-name: GitHub_to_AWS_via_FederatedOIDC
     - name: Sts GetCallerIdentity
       run: |
         aws sts get-caller-identity
