@@ -10,6 +10,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: us-east-1
+
 jobs:
 
   build:
@@ -22,8 +25,12 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4.2.1
       with:
         audience: sts.amazonaws.com
-        aws-region: us-east-1
+        aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::377161178071:role/DeployFunctions
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+    - name: Sts GetCallerIdentity
+      run: |
+        aws sts get-caller-identity
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
