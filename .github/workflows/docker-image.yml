@@ -22,15 +22,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Configure AWS Credentials for United States N.Virginia region audience
       uses: aws-actions/configure-aws-credentials@v4.2.1
       with:
         audience: sts.amazonaws.com
         aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::377161178071:role/DeployaApplications
-    - name: Sts GetCallerIdentity
+
+    - name: Build Docker image
       run: |
-        aws sts get-caller-identity
+        docker buildx build --platform linux/amd64 -t my-family-home-image
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
@@ -40,4 +43,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest --push .
+        docker tag my-family-home-image:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag my-family-home-image:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
