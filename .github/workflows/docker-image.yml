@@ -13,6 +13,7 @@ permissions:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: my-family-home/service
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
 
@@ -32,7 +33,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker buildx build --platform linux/amd64 -t my-family-home-image
+        docker buildx build --platform linux/amd64 -t my-family-home-image:$IMAGE_TAG .
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -41,9 +42,8 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker tag my-family-home-image:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker tag my-family-home-image:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker tag my-family-home-image:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag my-family-home-image:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
