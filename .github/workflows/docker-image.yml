@@ -26,7 +26,7 @@ jobs:
       with:
         audience: sts.amazonaws.com
         aws-region: ${{ env.AWS_REGION }}
-        role-to-assume: arn:aws:iam::377161178071:role/DeployFunctions
+        role-to-assume: arn:aws:iam::377161178071:role/DeployaApplications
     - name: Sts GetCallerIdentity
       run: |
         aws sts get-caller-identity
